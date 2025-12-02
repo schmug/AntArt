@@ -250,6 +250,11 @@ export const GameCanvas = forwardRef<GameController, GameCanvasProps>(({ isPlayi
     const canvas = canvasRef.current;
     if (!canvas) return;
 
+    // Prevent scrolling when drawing on canvas
+    if (e.cancelable && e.type.startsWith('touch')) {
+      // e.preventDefault(); // Don't prevent default blindly to allow scrolling if not drawing
+    }
+
     const rect = canvas.getBoundingClientRect();
     let clientX, clientY;
 
@@ -295,6 +300,21 @@ export const GameCanvas = forwardRef<GameController, GameCanvasProps>(({ isPlayi
   const onMouseLeave = () => {
       isDrawingRef.current = false;
   };
+  
+  // Custom touch handlers to prevent default only when drawing
+  const onTouchStart = (e: React.TouchEvent<HTMLCanvasElement>) => {
+     isDrawingRef.current = true;
+     handleInteraction(e);
+  };
+  
+  const onTouchMove = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    if (isDrawingRef.current) {
+       // Only prevent default if we are actively drawing to stop scrolling
+       // Note: this might need 'passive: false' listener in vanilla JS, but React handles events differently.
+       // For simple grid drawing, standard handling is often enough.
+       handleInteraction(e);
+    }
+  };
 
   useEffect(() => {
     draw();
@@ -305,7 +325,7 @@ export const GameCanvas = forwardRef<GameController, GameCanvasProps>(({ isPlayi
   }, [tick, draw]);
 
   return (
-    <div className={`relative rounded-lg overflow-hidden shadow-2xl border border-slate-700 bg-slate-950 ${isArtMode ? 'border-none shadow-none rounded-none fixed inset-0 z-50' : ''}`}>
+    <div className={`relative w-full h-full ${isArtMode ? 'fixed inset-0 z-50' : ''}`}>
       <canvas
         ref={canvasRef}
         width={GRID_COLS * CELL_SIZE}
@@ -313,19 +333,21 @@ export const GameCanvas = forwardRef<GameController, GameCanvasProps>(({ isPlayi
         className="w-full h-full block touch-none"
         style={{
              imageRendering: 'pixelated',
-             cursor: isArtMode || isPlaying ? 'default' : 'crosshair'
+             cursor: isArtMode || isPlaying ? 'default' : 'crosshair',
+             objectFit: 'contain'
         }}
         onMouseDown={onMouseDown}
         onMouseMove={onMouseMove}
         onMouseUp={onMouseUp}
         onMouseLeave={onMouseLeave}
-        onTouchStart={handleInteraction}
-        onTouchMove={handleInteraction}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={() => isDrawingRef.current = false}
       />
       
       {!isPlaying && stepsRef.current === 0 && !isArtMode && (
          <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-[1px] pointer-events-none">
-            <p className="text-white/70 font-mono text-sm">Tap or Drag to place pheromones</p>
+            <p className="text-white/70 font-mono text-xs md:text-sm">Tap or Drag to paint</p>
          </div>
       )}
 

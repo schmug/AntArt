@@ -31,27 +31,26 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
   onToggleArtMode
 }) => {
   return (
-    <div className="flex flex-col gap-4 w-full p-4 bg-slate-900 border border-slate-800 rounded-2xl shadow-lg">
+    <div className="flex flex-col gap-3 w-full p-3 md:p-4 bg-slate-900 border-t md:border border-slate-800 md:rounded-2xl shadow-lg mt-auto z-10">
       
       {/* Top Row: Playback Controls */}
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3 w-full md:w-auto">
+      <div className="flex items-center gap-2 md:gap-4">
             <button
               onClick={onTogglePlay}
-              className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold transition-all ${
+              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-bold transition-all shadow-lg ${
                 isPlaying
                   ? 'bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 border border-amber-500/50'
-                  : 'bg-emerald-500 text-slate-950 hover:bg-emerald-400 hover:scale-105 shadow-[0_0_15px_rgba(16,185,129,0.4)]'
+                  : 'bg-emerald-500 text-slate-950 hover:bg-emerald-400 active:scale-95 shadow-emerald-500/20'
               }`}
             >
               {isPlaying ? <Pause size={20} fill="currentColor" /> : <Play size={20} fill="currentColor" />}
-              {isPlaying ? 'PAUSE' : 'START'}
+              <span className="text-sm md:text-base">{isPlaying ? 'PAUSE' : 'START'}</span>
             </button>
 
             <button
               onClick={onStep}
               disabled={isPlaying}
-              className="p-3 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors border border-slate-700"
+              className="p-3 aspect-square rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors border border-slate-700 flex items-center justify-center"
               title="Step Forward"
             >
               <SkipForward size={20} />
@@ -59,44 +58,41 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
 
             <button
               onClick={onReset}
-              className="p-3 rounded-xl bg-slate-800 text-slate-300 hover:bg-red-500/20 hover:text-red-400 border border-slate-700 hover:border-red-500/50 transition-all"
+              className="p-3 aspect-square rounded-xl bg-slate-800 text-slate-300 hover:bg-red-500/20 hover:text-red-400 border border-slate-700 hover:border-red-500/50 transition-all flex items-center justify-center"
               title="Reset Board"
             >
               <RotateCcw size={20} />
             </button>
-          </div>
+      </div>
 
-          {/* Speed Slider */}
-          <div className="flex items-center gap-4 w-full md:w-auto md:min-w-[300px] bg-slate-950/50 p-3 rounded-xl border border-slate-800/50">
-            <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide min-w-[50px]">
-              Speed
-            </div>
-            <div className="flex-1 flex flex-col gap-1">
-                <input
-                type="range"
-                min="0"
-                max="100"
-                step="1"
-                value={speed}
-                onChange={(e) => onSpeedChange(Number(e.target.value))}
-                className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500 hover:accent-indigo-400 transition-all"
-                />
-            </div>
-          </div>
+      {/* Speed Slider Row */}
+      <div className="flex items-center gap-3 bg-slate-950/30 px-3 py-2 rounded-lg border border-slate-800/50">
+        <div className="text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wide min-w-[40px]">
+            Speed
+        </div>
+        <input
+            type="range"
+            min="0"
+            max="100"
+            step="1"
+            value={speed}
+            onChange={(e) => onSpeedChange(Number(e.target.value))}
+            className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500 hover:accent-indigo-400 transition-all"
+        />
       </div>
 
       {/* Bottom Row: Configuration */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 border-t border-slate-800/50">
+      <div className="flex gap-2 md:grid md:grid-cols-3">
           
           {/* Ant Selector */}
-          <div className="relative group">
+          <div className="relative group flex-grow md:flex-grow-0">
             <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-slate-500">
-                <ChevronDown size={16} />
+                <ChevronDown size={14} />
             </div>
             <select 
                 value={currentRule.name}
                 onChange={(e) => onRuleChange(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-200 text-sm focus:outline-none focus:border-indigo-500 appearance-none cursor-pointer hover:bg-slate-750"
+                className="w-full pl-9 pr-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-200 text-xs md:text-sm focus:outline-none focus:border-indigo-500 appearance-none cursor-pointer hover:bg-slate-750 truncate"
             >
                 {ANT_RULES.map(rule => (
                     <option key={rule.name} value={rule.name}>
@@ -109,23 +105,25 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
           {/* Random Colors */}
           <button 
             onClick={onRandomizeColors}
-            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-300 hover:bg-slate-700 hover:text-white transition-colors text-sm"
+            className="flex items-center justify-center p-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-300 hover:bg-slate-700 hover:text-white transition-colors aspect-square md:aspect-auto md:w-full md:gap-2"
+            title="Randomize Colors"
           >
-            <Palette size={16} />
-            <span>New Colors</span>
+            <Palette size={18} />
+            <span className="hidden md:inline text-sm">New Colors</span>
           </button>
 
           {/* Art Mode Toggle */}
           <button 
             onClick={onToggleArtMode}
-            className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border text-sm transition-all ${
+            className={`flex items-center justify-center p-2.5 rounded-xl border aspect-square md:aspect-auto md:w-full md:gap-2 transition-all ${
                 isArtMode 
                 ? 'bg-purple-500 text-white border-purple-400' 
                 : 'bg-slate-800 border-slate-700 text-slate-300 hover:text-white hover:bg-slate-700'
             }`}
+            title={isArtMode ? 'Exit Art Mode' : 'View Art'}
           >
-            <Eye size={16} />
-            <span>{isArtMode ? 'Exit Art Mode' : 'View Art'}</span>
+            <Eye size={18} />
+            <span className="hidden md:inline text-sm">{isArtMode ? 'Exit Art' : 'View Art'}</span>
           </button>
       </div>
     </div>
