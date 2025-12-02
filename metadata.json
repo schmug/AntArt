@@ -1,0 +1,5 @@
+{
+  "name": "Chromatic Ant",
+  "description": "A vibrant, twisted implementation of Langton's Ant with a 4-color state cycle and scoring system.",
+  "requestFramePermissions": []
+}
